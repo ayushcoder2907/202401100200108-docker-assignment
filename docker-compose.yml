@@ -1,0 +1,41 @@
+
+services:
+  backend:
+    build: ./backend
+    image: festpass-backend:dev
+    environment:
+      DB_HOST: db
+      POSTGRES_DB: festpass
+      POSTGRES_USER: festpass
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-festpass_dev_password}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: festpass
+      POSTGRES_USER: festpass
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-festpass_dev_password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U festpass -d festpass"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

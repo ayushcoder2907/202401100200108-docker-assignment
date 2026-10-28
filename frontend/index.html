@@ -1,0 +1,80 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FestPass Registration</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 520px;
+      margin: 60px auto;
+      padding: 20px;
+      background: #f3f4f6;
+      color: #111827;
+    }
+    main {
+      background: white;
+      padding: 28px;
+      border-radius: 12px;
+      box-shadow: 0 4px 18px #0001;
+    }
+    input, button {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 12px;
+      margin-top: 12px;
+      border-radius: 6px;
+    }
+    input { border: 1px solid #d1d5db; }
+    button {
+      background: #2563eb;
+      color: white;
+      border: 0;
+      cursor: pointer;
+    }
+    #message { margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>FestPass</h1>
+    <p>Register for your next event.</p>
+    <form id="registration-form">
+      <input id="name" placeholder="Full name" required>
+      <input id="email" type="email" placeholder="Email address" required>
+      <button type="submit">Register</button>
+    </form>
+    <p id="message" role="status"></p>
+  </main>
+  <script>
+    const form = document.getElementById("registration-form");
+    const message = document.getElementById("message");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      message.textContent = "Submitting...";
+
+      try {
+        const response = await fetch("/api/registrations", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: document.getElementById("name").value,
+            email: document.getElementById("email").value
+          })
+        });
+
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || "Registration failed");
+
+        message.textContent = "Registration successful!";
+        form.reset();
+      } catch (error) {
+        message.textContent = "Could not register. Check that the services are running.";
+      }
+    });
+  </script>
+</body>
+</html>
