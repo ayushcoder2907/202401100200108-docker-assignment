@@ -1,8 +1,7 @@
 
 services:
   backend:
-    build: ./backend
-    image: festpass-backend:dev
+    image: festpass-backend:alpine-test
     environment:
       DB_HOST: db
       POSTGRES_DB: festpass
